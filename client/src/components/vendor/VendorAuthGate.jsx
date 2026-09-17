@@ -27,7 +27,7 @@ export default function VendorAuthGate() {
 
   return (
     <section className="wrap" style={{ maxWidth: 420, paddingTop: 60 }}>
-      <div className="eyebrow">Boutique portal</div>
+      <div className="eyebrow">Vendor portal</div>
       <h2 className="serif" style={{ margin: '6px 0 16px' }}>
         Vendor sign in
       </h2>

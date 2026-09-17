@@ -50,7 +50,7 @@ export default function FavouritesDrawer({ onClose }) {
           )
         })
       ) : (
-        <div className="notice">Tap the heart on any fragrance to save it here.</div>
+        <div className="notice">Tap the heart on any product to save it here.</div>
       )}
     </>
   )

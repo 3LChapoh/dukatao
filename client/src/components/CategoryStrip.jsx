@@ -5,8 +5,8 @@ export default function CategoryStrip({ onSelect }) {
     <section id="categories" className="wrap reveal in">
       <div className="section-head">
         <div>
-          <div className="eyebrow">Browse by mood</div>
-          <h2>The fragrance edit</h2>
+          <div className="eyebrow">Shop by category</div>
+          <h2>Find what you need</h2>
         </div>
         <span className="muted" style={{ fontSize: 11 }}>
           Swipe to explore →

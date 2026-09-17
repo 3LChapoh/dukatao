@@ -64,20 +64,31 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
 
   return (
     <section id="collection" className="wrap reveal in">
+      <a
+        href="#home"
+        className="muted"
+        style={{ fontSize: 12, display: 'inline-block', marginBottom: 12 }}
+        onClick={(e) => {
+          e.preventDefault()
+          window.location.hash = ''
+        }}
+      >
+        ← Back to home
+      </a>
       <div className="section-head">
         <div>
-          <div className="eyebrow">Curated in Nairobi</div>
-          <h2>The collection</h2>
+          <div className="eyebrow">All products</div>
+          <h2>Browse everything</h2>
         </div>
         <span className="muted" style={{ fontSize: 11 }}>
-          {filtered.length} fragrances
+          {filtered.length} products
         </span>
       </div>
 
       <div className="controls">
         <input
           className="field search"
-          placeholder="Search perfume, oud…"
+          placeholder="Search products…"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -142,7 +153,7 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
               ))
             ) : (
               <div className="notice" style={{ gridColumn: '1/-1' }}>
-                No fragrance matched your search. Try another note or category.
+                No product matched your search. Try another term or category.
               </div>
             )}
           </div>

@@ -1,12 +1,12 @@
 import { useState } from 'react'
+import { categories } from '../../data/categories'
 
-const CATEGORIES = ['edp', 'edt', 'parfum', 'attar', 'oud', 'gift set']
 
 function ProductForm({ initial, onSubmit, onCancel, submitting }) {
   const [fields, setFields] = useState({
     name: initial?.name || '',
     price: initial?.price || '',
-    category: initial?.category || CATEGORIES[0],
+    category: initial?.category || categories[0].id,
     description: initial?.description || '',
     stock: initial?.stock ?? '',
   })
@@ -45,8 +45,8 @@ function ProductForm({ initial, onSubmit, onCancel, submitting }) {
 
       <label>Category</label>
       <select className="field" value={fields.category} onChange={(e) => update('category', e.target.value)}>
-        {CATEGORIES.map((c) => (
-          <option key={c} value={c}>{c}</option>
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>{c.name}</option>
         ))}
       </select>
 

@@ -14,7 +14,7 @@ function Dashboard() {
       <div className="section-head">
         <div>
           <div className="eyebrow">Admin</div>
-          <h2 className="serif">Ruby's Choice control room</h2>
+          <h2 className="serif">Dukatao control room</h2>
         </div>
         <button className="ghostbtn" onClick={logout}>
           Sign out ({admin.name})

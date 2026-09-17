@@ -1,10 +1,10 @@
 export default function Hero({ stats, heroImages = [] }) {
   const fallbackImages = [
-    'https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1583845112203-29329902332e?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=600&h=800&q=80&auto=format&fit=crop',
   ]
 
   const images = heroImages.length > 0 ? heroImages : fallbackImages
@@ -24,7 +24,7 @@ export default function Hero({ stats, heroImages = [] }) {
             >
               <img
                 src={src}
-                alt="Fine fragrance"
+                alt="Home essentials"
                 loading={i === 0 ? 'eager' : 'lazy'}
               />
             </div>
@@ -36,16 +36,16 @@ export default function Hero({ stats, heroImages = [] }) {
 
       <div className="hero-copy">
         <div className="eyebrow">
-          Nairobi's house of fine fragrance
+          Nairobi's home essentials store
         </div>
 
         <h1>
-          Wear something <em>unforgettable.</em>
+          Everything your home <em>needs.</em>
         </h1>
 
         <p>
-          A considered house of fine perfume, rare attars and beautiful
-          scent rituals from Nairobi.
+          Quality kitchenware, appliances and home essentials, delivered
+          across Nairobi.
         </p>
 
         <div className="cta">
@@ -57,14 +57,14 @@ export default function Hero({ stats, heroImages = [] }) {
                 ?.scrollIntoView({ behavior: 'smooth' })
             }
           >
-            Explore the Collection
+            Shop Now
           </button>
         </div>
 
         <div className="hero-stats">
           <div className="stat">
-            <strong>{stats.fragrances}</strong>
-            <span>Fragrances</span>
+            <strong>{stats.products}</strong>
+            <span>Products</span>
           </div>
 
           <div className="stat">

@@ -1,6 +1,6 @@
 // Run once (locally or as a one-off Render job) to create or reset THE single
 // boutique account (this is a single-vendor store — only ever one Vendor doc):
-//   VENDOR_BOUTIQUE_NAME="Ruby's Choice" VENDOR_CONTACT_NAME="Boneye" \
+//   VENDOR_BOUTIQUE_NAME="Dukatao" VENDOR_CONTACT_NAME="Boneye" \
 //   VENDOR_EMAIL=you@example.com VENDOR_PHONE="07XX XXX XXX" VENDOR_PASSWORD=changeme \
 //   node src/seed/seedVendor.js
 // Requires MONGO_URI to be set (loaded via dotenv from .env if present).

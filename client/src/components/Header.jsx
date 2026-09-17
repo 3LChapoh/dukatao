@@ -20,7 +20,7 @@ export default function Header({ theme, onToggleTheme, onOpenCart, onOpenAccount
     <header className={`nav${scrolled ? ' scrolled' : ''}`}>
       <div className="wrap nav-inner">
         <a className="logo" href="#home">
-          Ruby's <span>Choice</span>
+          Duka<span>tao</span>
         </a>
         <nav className="navlinks" aria-label="Primary">
           <a href="#collection">Collection</a>

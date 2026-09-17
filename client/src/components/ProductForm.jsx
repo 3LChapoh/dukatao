@@ -25,8 +25,8 @@ export default function ProductForm({ initial, showVendorField, onSubmit, onCanc
       </label>
       {showVendorField && (
         <label>
-          Boutique / vendor
-          <input className="field" required value={form.vendor} onChange={(e) => update('vendor', e.target.value)} placeholder="e.g. Maison Scents KE" />
+          Vendor name
+          <input className="field" required value={form.vendor} onChange={(e) => update('vendor', e.target.value)} placeholder="e.g. Dukatao" />
         </label>
       )}
       <label>

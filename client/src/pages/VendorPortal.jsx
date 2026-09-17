@@ -12,7 +12,7 @@ function Dashboard() {
     <section className="wrap dash" style={{ paddingTop: 40 }}>
       <div className="section-head">
         <div>
-          <div className="eyebrow">Boutique portal</div>
+          <div className="eyebrow">Vendor portal</div>
           <h2 className="serif">{vendor.boutiqueName}</h2>
         </div>
         <button className="ghostbtn" onClick={logout}>

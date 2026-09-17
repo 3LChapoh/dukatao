@@ -27,7 +27,7 @@ app.use('/api/orders', orderRoutes)
 app.use('/api/config', configRoutes)
 
 app.get('/', (req, res) => {
-  res.json({ message: "Ruby's Choice API is running" })
+  res.json({ message: "Dukatao API is running" })
 })
 
 // centralized error handler (catches multer errors, thrown errors, etc.)

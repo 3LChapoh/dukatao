@@ -9,6 +9,7 @@ import { productsApi, configApi } from './api'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import CategoryStrip from './components/CategoryStrip'
+import FeaturedProducts from './components/FeaturedProducts'
 import ProductGrid from './components/ProductGrid'
 import Footer from './components/Footer'
 import BottomNav from './components/BottomNav'
@@ -20,12 +21,26 @@ import VendorPortal from './pages/VendorPortal'
 import AdminPortal from './pages/AdminPortal'
 
 function AppShell() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('rc_theme') || 'dark')
+  // Always start in light mode, regardless of any previously saved preference.
+  const [theme, setTheme] = useState('light')
   const [drawer, setDrawer] = useState(null) // 'cart' | 'account' | 'favourites' | null
   const [pendingCategory, setPendingCategory] = useState(null)
   const [ordersRefreshKey, setOrdersRefreshKey] = useState(0)
-  const [stats, setStats] = useState({ fragrances: '—' })
+  const [stats, setStats] = useState({ products: '—' })
   const [heroImages, setHeroImages] = useState([])
+
+  // Separate from the top-level '#/vendor' / '#/admin' router below: this just
+  // toggles between the home page and the full "all products" page, both of
+  // which share this same cart/favourites/account state.
+  const [subRoute, setSubRoute] = useState(() => window.location.hash)
+  useEffect(() => {
+    function onHashChange() {
+      setSubRoute(window.location.hash)
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+  const showAllProducts = subRoute.startsWith('#/products')
 
   useEffect(() => {
     document.body.classList.toggle('light', theme === 'light')
@@ -37,7 +52,7 @@ function AppShell() {
       .list()
       .then((data) => {
         if (!Array.isArray(data)) return
-        setStats({ fragrances: data.length })
+        setStats({ products: data.length })
       })
       .catch(() => {})
   }, [])
@@ -68,9 +83,20 @@ function AppShell() {
       />
 
       <main>
-        <Hero stats={stats} heroImages={heroImages} />
-        <CategoryStrip onSelect={(id) => setPendingCategory(id)} />
-        <ProductGrid initialCategory={pendingCategory} onCategoryConsumed={() => setPendingCategory(null)} />
+        {showAllProducts ? (
+          <ProductGrid initialCategory={pendingCategory} onCategoryConsumed={() => setPendingCategory(null)} />
+        ) : (
+          <>
+            <Hero stats={stats} heroImages={heroImages} />
+            <CategoryStrip
+              onSelect={(id) => {
+                setPendingCategory(id)
+                window.location.hash = '#/products'
+              }}
+            />
+            <FeaturedProducts limit={12} onMore={() => (window.location.hash = '#/products')} />
+          </>
+        )}
       </main>
 
       <Footer />
