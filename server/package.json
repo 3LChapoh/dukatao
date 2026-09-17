@@ -1,7 +1,7 @@
 {
-  "name": "ruby-choice-server",
+  "name": "dukatao-server",
   "version": "1.0.0",
-  "description": "Ruby's Choice backend API",
+  "description": "DukaTao backend API",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {

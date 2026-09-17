@@ -16,7 +16,6 @@ import DrawerOverlay from './components/DrawerOverlay'
 import CartDrawer from './components/CartDrawer'
 import AccountDrawer from './components/AccountDrawer'
 import FavouritesDrawer from './components/FavouritesDrawer'
-import VendorPortal from './pages/VendorPortal'
 import AdminPortal from './pages/AdminPortal'
 
 function AppShell() {
@@ -94,8 +93,7 @@ function AppShell() {
   )
 }
 
-// Minimal hash router: '#/vendor' and '#/admin' load their own portals with
-// their own auth sessions, entirely separate from the customer storefront below.
+
 export default function App() {
   const [route, setRoute] = useState(() => window.location.hash)
 
@@ -109,11 +107,9 @@ export default function App() {
 
   return (
     <ToastProvider>
-      {route.startsWith('#/vendor') ? (
-        <VendorPortal />
-      ) : route.startsWith('#/admin') ? (
-        <AdminPortal />
-      ) : (
+      {route.startsWith('#/admin') ? (
+  <AdminPortal />
+) : (
         <AuthProvider>
           <FavouritesProvider>
             <CartProvider>

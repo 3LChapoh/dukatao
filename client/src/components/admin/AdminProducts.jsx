@@ -58,7 +58,12 @@ export default function AdminProducts() {
     return (
       <div className="mini-grid">
         <h3 style={{ fontSize: 14, marginBottom: 10 }}>{editing === 'new' ? 'Add product' : `Edit "${editing.name}"`}</h3>
-        <ProductForm initial={editing === 'new' ? null : editing} showVendorField onSubmit={handleSubmit} onCancel={() => setEditing(null)} busy={busy} />
+       <ProductForm
+  initial={editing === 'new' ? null : editing}
+  onSubmit={handleSubmit}
+  onCancel={() => setEditing(null)}
+  busy={busy}
+/>
       </div>
     )
   }

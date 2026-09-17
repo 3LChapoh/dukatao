@@ -54,7 +54,9 @@ export default function AdminOrders() {
             <strong>{o._id.slice(-7).toUpperCase()}</strong>
             <span className="muted"> · {new Date(o.createdAt).toLocaleDateString()}</span>
             <br />
-            <span className="muted">{o.vendors.join(', ')}</span>
+            <span className="muted">
+  {o.items?.length || 0} item{o.items?.length === 1 ? '' : 's'}
+</span>
             <br />
             <b className="mono">{money(o.total)}</b>
             <br />

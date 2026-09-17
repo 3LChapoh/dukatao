@@ -56,25 +56,49 @@ export const productsApi = {
 }
 
 export const usersApi = {
-  register: (payload) => request('/api/users/register', { method: 'POST', body: payload }),
-  login: (payload) => request('/api/users/login', { method: 'POST', body: payload }),
-  adminLogin: (payload) => request('/api/users/admin-login', { method: 'POST', body: payload }),
-  me: (token) => request('/api/users/me', { token }),
-  updateMe: (payload, token) => request('/api/users/me', { method: 'PUT', body: payload, token }),
+  register: (payload) =>
+    request('/api/users/register', {
+      method: 'POST',
+      body: payload,
+    }),
+
+  login: (payload) =>
+    request('/api/users/login', {
+      method: 'POST',
+      body: payload,
+    }),
+
+  adminLogin: (payload) =>
+    request('/api/users/admin-login', {
+      method: 'POST',
+      body: payload,
+    }),
+
+  me: (token) =>
+    request('/api/users/me', {
+      token,
+    }),
+
+  updateMe: (payload, token) =>
+    request('/api/users/me', {
+      method: 'PUT',
+      body: payload,
+      token,
+    }),
+
+  changePassword: (payload, token) =>
+    request('/api/users/change-password', {
+      method: 'PUT',
+      body: payload,
+      token,
+    }),
 }
 
-// Single-vendor store: only sign-in remains. There is no apply/approve/PIN
-// pipeline since the one boutique account is created via a server-side seed script.
-export const vendorsApi = {
-  login: (payload) => request('/api/vendors/login', { method: 'POST', body: payload }),
-  me: (token) => request('/api/vendors/me', { token }),
-}
 
 export const ordersApi = {
   create: (payload, token) => request('/api/orders', { method: 'POST', body: payload, token }),
   mine: (token) => request('/api/orders/mine', { token }),
   cancel: (id, token) => request(`/api/orders/${id}/cancel`, { method: 'PUT', token }),
-  vendorOrders: (token) => request('/api/orders/vendor', { token }),
   all: (token, status) => request(`/api/orders${status ? `?status=${status}` : ''}`, { token }),
   updateStatus: (id, status, token) =>
     request(`/api/orders/${id}/status`, { method: 'PUT', body: { status }, token }),

@@ -4,7 +4,7 @@ const cors = require('cors')
 const connectDB = require('./config/db')
 const productRoutes = require('./routes/productRoutes')
 const userRoutes = require('./routes/userRoutes')
-const vendorRoutes = require('./routes/vendorRoutes')
+
 const orderRoutes = require('./routes/orderRoutes')
 const configRoutes = require('./routes/configRoutes')
 
@@ -22,12 +22,12 @@ app.use(express.json())
 
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
-app.use('/api/vendors', vendorRoutes)
+
 app.use('/api/orders', orderRoutes)
 app.use('/api/config', configRoutes)
 
 app.get('/', (req, res) => {
-  res.json({ message: "Ruby's Choice API is running" })
+  res.json({ message: 'DukaTao API is running' })
 })
 
 // centralized error handler (catches multer errors, thrown errors, etc.)

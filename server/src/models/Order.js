@@ -7,21 +7,28 @@ const orderItemSchema = new mongoose.Schema(
       ref: 'Product',
       required: true,
     },
+
     name: {
       type: String,
       required: true,
       trim: true,
     },
+
+    // Kept temporarily for compatibility with existing product/order data.
+    // All new DukaTao products use vendor: "DukaTao".
     vendor: {
       type: String,
       required: true,
       trim: true,
+      default: 'DukaTao',
     },
+
     price: {
       type: Number,
       required: true,
       min: 0,
     },
+
     qty: {
       type: Number,
       required: true,
@@ -29,34 +36,6 @@ const orderItemSchema = new mongoose.Schema(
     },
   },
   { _id: false }
-)
-
-const vendorOrderSchema = new mongoose.Schema(
-  {
-    vendor: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    items: {
-      type: [orderItemSchema],
-      validate: {
-        validator: (arr) => arr.length > 0,
-        message: 'Vendor order must contain at least one item',
-      },
-    },
-    subtotal: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    status: {
-      type: String,
-      enum: ['Pending', 'Processing', 'Completed', 'Cancelled'],
-      default: 'Pending',
-    },
-  },
-  { _id: true }
 )
 
 const orderSchema = new mongoose.Schema(
@@ -97,11 +76,11 @@ const orderSchema = new mongoose.Schema(
       trim: true,
     },
 
-    vendorOrders: {
-      type: [vendorOrderSchema],
+    items: {
+      type: [orderItemSchema],
       validate: {
         validator: (arr) => arr.length > 0,
-        message: 'Order must contain at least one vendor order',
+        message: 'Order must contain at least one item',
       },
     },
 

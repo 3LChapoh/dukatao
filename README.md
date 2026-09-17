@@ -1,28 +1,50 @@
-# Dukatao (Ruby's Choice)
+# DukaTao
 
-Single-vendor luxury perfume storefront — MERN stack (Express/MongoDB backend in `server/`, React/Vite frontend in `client/`).
+DukaTao is a single-vendor online shop built with the MERN stack.
 
-## Setup
+## Architecture
 
-**Server**
-```bash
-cd server
-npm install
-cp .env.example .env   # fill in MONGO_URI, JWT_SECRET, etc. if you don't have one yet
-npm run dev
-```
+- React + Vite frontend
+- Node.js + Express backend
+- MongoDB + Mongoose
+- Cloudinary for product images
+- JWT authentication
+- Admin and customer accounts
 
-Create the one boutique account (only needed once, or to reset its details):
-```bash
-cd server
-VENDOR_BOUTIQUE_NAME="Ruby's Choice" VENDOR_CONTACT_NAME="Boneye" \
-VENDOR_EMAIL=you@example.com VENDOR_PHONE="07XX XXX XXX" VENDOR_PASSWORD=changeme \
-node src/seed/seedVendor.js
-```
+## Account Types
 
-**Client**
-```bash
-cd client
-npm install
-npm run dev
-```
+### Customer
+
+Customers can:
+
+- Register
+- Log in
+- Browse products
+- Add products to cart
+- Checkout
+- View their orders
+- Cancel eligible orders
+
+### Admin
+
+DukaTao has one shop admin account.
+
+The admin can:
+
+- Log in with username and password
+- Add products
+- Edit products
+- Delete products
+- Manage orders
+- Update order status
+- Manage hero images
+- Change the admin password
+
+There is no vendor account or vendor dashboard.
+
+## Project Structure
+
+```text
+dukatao/
+├── client/
+└── server/

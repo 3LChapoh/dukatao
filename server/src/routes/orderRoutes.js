@@ -1,24 +1,54 @@
 const express = require('express')
 const router = express.Router()
-const { protect, optionalAuth, requireRole, attachVendor, attachVendorIfVendor } = require('../middleware/auth')
+
+const {
+  protect,
+  optionalAuth,
+  requireRole,
+} = require('../middleware/auth')
+
 const {
   createOrder,
   getMyOrders,
-  getVendorOrders,
   getAllOrders,
   updateStatus,
   cancelMyOrder,
 } = require('../controllers/orderController')
 
-// guest checkout allowed; optionalAuth attaches req.auth if a customer is signed in
+// Guest checkout is allowed.
+// If a customer is logged in, optionalAuth attaches req.auth.
 router.post('/', optionalAuth, createOrder)
 
-router.get('/mine', protect, requireRole('customer'), getMyOrders)
-router.put('/:id/cancel', protect, requireRole('customer'), cancelMyOrder)
+// Customer order history.
+router.get(
+  '/mine',
+  protect,
+  requireRole('customer'),
+  getMyOrders
+)
 
-router.get('/vendor', protect, requireRole('vendor'), attachVendor, getVendorOrders)
+// Customer can cancel their own order.
+router.put(
+  '/:id/cancel',
+  protect,
+  requireRole('customer'),
+  cancelMyOrder
+)
 
-router.get('/', protect, requireRole('admin'), getAllOrders)
-router.put('/:id/status', protect, requireRole('vendor', 'admin'), attachVendorIfVendor, updateStatus)
+// Admin order management.
+router.get(
+  '/',
+  protect,
+  requireRole('admin'),
+  getAllOrders
+)
+
+router.put(
+  '/:id/status',
+  protect,
+  requireRole('admin'),
+  updateStatus
+)
 
 module.exports = router
+

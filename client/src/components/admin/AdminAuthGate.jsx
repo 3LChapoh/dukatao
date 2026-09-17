@@ -1,53 +1,100 @@
 import { useState } from 'react'
 import { useAdminAuth } from '../../context/AdminAuthContext'
-import { useToast } from '../../context/ToastContext'
 import PasswordField from '../PasswordField'
 
-export default function AdminAuthGate() {
-  const { login } = useAdminAuth()
-  const showToast = useToast()
-  const [busy, setBusy] = useState(false)
-  const [form, setForm] = useState({ email: '', password: '', securityKey: '' })
+export default function AdminAuthGate({ children }) {
+  const { user, loading, login } = useAdminAuth()
 
-  async function submit(e) {
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+  })
+
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  if (loading) {
+    return (
+      <div className="admin-auth-loading">
+        Checking admin session...
+      </div>
+    )
+  }
+
+  if (user) {
+    return children
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault()
-    setBusy(true)
+    setError('')
+    setSubmitting(true)
+
     try {
-      await login(form.email, form.password, form.securityKey)
+      await login(form.username, form.password)
     } catch (err) {
-      showToast(err.message || 'Sign in failed', true)
+      setError(
+        err?.message ||
+          err?.response?.data?.message ||
+          'Invalid username or password'
+      )
     } finally {
-      setBusy(false)
+      setSubmitting(false)
     }
   }
 
   return (
-    <section className="wrap" style={{ maxWidth: 380, paddingTop: 60 }}>
-      <div className="eyebrow">Admin</div>
-      <h2 className="serif" style={{ margin: '6px 0 16px' }}>
-        Admin sign in
-      </h2>
-      <form className="form" onSubmit={submit}>
+    <div className="admin-auth-gate">
+      <form onSubmit={handleSubmit} className="admin-login-form">
+        <h1>DukaTao Admin</h1>
+
+        <p>
+          Sign in to manage your shop.
+        </p>
+
         <label>
-          Email
-          <input className="field" type="email" required value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+          Username
+          <input
+            type="text"
+            value={form.username}
+            onChange={(e) =>
+              setForm((f) => ({
+                ...f,
+                username: e.target.value,
+              }))
+            }
+            placeholder="Enter admin username"
+            autoComplete="username"
+            required
+          />
         </label>
+
         <label>
           Password
-          <PasswordField value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} required />
+          <PasswordField
+            value={form.password}
+            onChange={(e) =>
+              setForm((f) => ({
+                ...f,
+                password: e.target.value,
+              }))
+            }
+            placeholder="Enter admin password"
+            autoComplete="current-password"
+            required
+          />
         </label>
-        <label>
-          Security Key
-          <PasswordField value={form.securityKey} onChange={(e) => setForm((f) => ({ ...f, securityKey: e.target.value }))} required />
-        </label>
-        <button className="goldbtn" disabled={busy}>
-          {busy ? 'Please wait…' : 'Sign in'}
+
+        {error && (
+          <div className="admin-login-error">
+            {error}
+          </div>
+        )}
+
+        <button type="submit" disabled={submitting}>
+          {submitting ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
-      <p className="muted" style={{ fontSize: 11, marginTop: 12 }}>
-        Admin accounts are created with the <code>npm run seed:admin</code> script on the server, not
-        through this form.
-      </p>
-    </section>
+    </div>
   )
 }

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-// payload: { id, role } where role is 'customer' | 'vendor' | 'admin'
+// payload: { id, role } where role is 'customer' | 'admin'
 function generateToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30d' })
 }

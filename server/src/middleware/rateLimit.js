@@ -2,7 +2,7 @@ const rateLimit = require('express-rate-limit')
 
 // Applies to login/activation endpoints: 10 attempts per 15 minutes per IP.
 // Keeps normal typos/retries working while blocking brute-force scripts
-// against admin-login (password + security key) and vendor activation
+// against admin-login and other authentication attempts
 // (a 6-digit PIN — only 900,000 combinations).
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

@@ -2,31 +2,18 @@ const mongoose = require('mongoose')
 const Order = require('../models/Order')
 const Product = require('../models/Product')
 
-const ORDER_STATUSES = ['Pending', 'Processing', 'Completed', 'Cancelled']
+const SHOP_NAME = 'DukaTao'
+
+const ORDER_STATUSES = [
+  'Pending',
+  'Processing',
+  'Completed',
+  'Cancelled',
+]
 
 function validQuantity(value) {
   const quantity = Number(value)
   return Number.isInteger(quantity) && quantity >= 1
-}
-
-function calculateOverallStatus(vendorOrders) {
-  if (!vendorOrders.length) return 'Pending'
-
-  const statuses = vendorOrders.map((vendorOrder) => vendorOrder.status)
-
-  if (statuses.every((status) => status === 'Cancelled')) {
-    return 'Cancelled'
-  }
-
-  if (statuses.every((status) => status === 'Completed')) {
-    return 'Completed'
-  }
-
-  if (statuses.some((status) => status === 'Processing' || status === 'Completed')) {
-    return 'Processing'
-  }
-
-  return 'Pending'
 }
 
 async function createOrder(req, res) {
@@ -52,7 +39,12 @@ async function createOrder(req, res) {
         )
       }
 
-      if (!customerName || !customerEmail || !deliveryLocation || !paymentMethod) {
+      if (
+        !customerName ||
+        !customerEmail ||
+        !deliveryLocation ||
+        !paymentMethod
+      ) {
         throw Object.assign(
           new Error(
             'Customer name, email, delivery location and payment method are required'
@@ -61,7 +53,7 @@ async function createOrder(req, res) {
         )
       }
 
-      const vendorMap = new Map()
+      const orderItems = []
       let total = 0
 
       for (const item of items) {
@@ -107,35 +99,18 @@ async function createOrder(req, res) {
         const itemTotal = product.price * quantity
         total += itemTotal
 
-        if (!vendorMap.has(product.vendor)) {
-          vendorMap.set(product.vendor, {
-            vendor: product.vendor,
-            items: [],
-            subtotal: 0,
-          })
-        }
-
-        const vendorOrder = vendorMap.get(product.vendor)
-
-        vendorOrder.items.push({
+        orderItems.push({
           product: product._id,
           name: product.name,
-          vendor: product.vendor,
+          vendor: product.vendor || SHOP_NAME,
           price: product.price,
           qty: quantity,
         })
-
-        vendorOrder.subtotal += itemTotal
       }
 
-      const vendorOrders = Array.from(vendorMap.values()).map((vendorOrder) => ({
-        ...vendorOrder,
-        status: 'Pending',
-      }))
-
-      if (!vendorOrders.length) {
+      if (!orderItems.length) {
         throw Object.assign(
-          new Error('Order must contain at least one valid vendor order'),
+          new Error('Order must contain at least one item'),
           { status: 400 }
         )
       }
@@ -154,7 +129,7 @@ async function createOrder(req, res) {
             deliveryLocation,
             paymentMethod,
 
-            vendorOrders,
+            items: orderItems,
 
             total,
             status: 'Pending',
@@ -186,51 +161,6 @@ async function getMyOrders(req, res) {
   } catch (err) {
     res.status(500).json({
       message: 'Failed to fetch orders',
-      error: err.message,
-    })
-  }
-}
-
-async function getVendorOrders(req, res) {
-  try {
-    const orders = await Order.find({
-      'vendorOrders.vendor': req.vendor.boutiqueName,
-    }).sort({ createdAt: -1 })
-
-    const vendorName = req.vendor.boutiqueName
-
-    const vendorOrders = orders.map((order) => {
-      const vendorOrder = order.vendorOrders.find(
-        (entry) => entry.vendor === vendorName
-      )
-
-      if (!vendorOrder) return null
-
-      return {
-        orderId: order._id,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-
-        customerName: order.customerName,
-        customerEmail: order.customerEmail,
-        customerPhone: order.customerPhone,
-        deliveryLocation: order.deliveryLocation,
-
-        paymentMethod: order.paymentMethod,
-
-        vendor: vendorOrder.vendor,
-        items: vendorOrder.items,
-        subtotal: vendorOrder.subtotal,
-        status: vendorOrder.status,
-
-        overallStatus: order.status,
-      }
-    }).filter(Boolean)
-
-    res.json(vendorOrders)
-  } catch (err) {
-    res.status(500).json({
-      message: 'Failed to fetch vendor orders',
       error: err.message,
     })
   }
@@ -287,81 +217,30 @@ async function updateStatus(req, res) {
       })
     }
 
-    if (req.auth.role === 'vendor') {
-      const vendorName = req.vendor.boutiqueName
-
-      const vendorOrder = order.vendorOrders.find(
-        (entry) => entry.vendor === vendorName
-      )
-
-      if (!vendorOrder) {
-        return res.status(403).json({
-          message: 'This order does not belong to your boutique',
-        })
-      }
-
-      if (vendorOrder.status === 'Cancelled') {
-        return res.status(400).json({
-          message: 'Cancelled vendor orders cannot be changed',
-        })
-      }
-
-      if (vendorOrder.status === 'Completed' && status !== 'Completed') {
-        return res.status(400).json({
-          message: 'Completed vendor orders cannot be moved backwards',
-        })
-      }
-
-      if (status === 'Cancelled' && vendorOrder.status !== 'Cancelled') {
-        await restockVendorOrder(vendorOrder)
-      }
-
-      vendorOrder.status = status
-
-      order.status = calculateOverallStatus(order.vendorOrders)
-
-      await order.save()
-
-      return res.json({
-        message: 'Vendor order updated',
-        orderId: order._id,
-        vendor: vendorOrder.vendor,
-        status: vendorOrder.status,
-        overallStatus: order.status,
+    if (order.status === 'Cancelled') {
+      return res.status(400).json({
+        message: 'Cancelled orders cannot be changed',
       })
     }
 
-    // Admin can update the overall order.
-    // If admin cancels the order, restock every vendor's items.
+    if (order.status === 'Completed' && status !== 'Completed') {
+      return res.status(400).json({
+        message: 'Completed orders cannot be moved backwards',
+      })
+    }
+
     if (status === 'Cancelled' && order.status !== 'Cancelled') {
       await restockOrder(order)
     }
 
     order.status = status
 
-    if (status === 'Cancelled') {
-      order.vendorOrders.forEach((vendorOrder) => {
-        if (vendorOrder.status !== 'Cancelled') {
-          vendorOrder.status = 'Cancelled'
-        }
-      })
-    }
-
-    if (status === 'Completed') {
-      order.vendorOrders.forEach((vendorOrder) => {
-        if (vendorOrder.status !== 'Cancelled') {
-          vendorOrder.status = 'Completed'
-        }
-      })
-    }
-
     await order.save()
 
     res.json(order)
   } catch (err) {
     res.status(400).json({
-      message: 'Failed to update order',
-      error: err.message,
+      message: err.message || 'Failed to update order',
     })
   }
 }
@@ -408,10 +287,6 @@ async function cancelMyOrder(req, res) {
 
       await restockOrder(order, session)
 
-      order.vendorOrders.forEach((vendorOrder) => {
-        vendorOrder.status = 'Cancelled'
-      })
-
       order.status = 'Cancelled'
 
       await order.save({ session })
@@ -430,14 +305,10 @@ async function cancelMyOrder(req, res) {
 }
 
 async function restockOrder(order, session = null) {
-  for (const vendorOrder of order.vendorOrders) {
-    await restockVendorOrder(vendorOrder, session)
-  }
-}
-
-async function restockVendorOrder(vendorOrder, session = null) {
-  for (const item of vendorOrder.items) {
-    if (!mongoose.Types.ObjectId.isValid(item.product)) continue
+  for (const item of order.items) {
+    if (!mongoose.Types.ObjectId.isValid(item.product)) {
+      continue
+    }
 
     const query = Product.findByIdAndUpdate(
       item.product,
@@ -456,7 +327,6 @@ async function restockVendorOrder(vendorOrder, session = null) {
 module.exports = {
   createOrder,
   getMyOrders,
-  getVendorOrders,
   getAllOrders,
   updateStatus,
   cancelMyOrder,

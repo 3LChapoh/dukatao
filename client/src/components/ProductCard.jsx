@@ -35,7 +35,7 @@ export default function ProductCard({ product, isFavourite, onToggleFavourite })
         </button>
       </div>
       <div className="p-body">
-        <span className="vendor">{product.vendor}</span>
+        <span className="vendor">DukaTao</span>
         <h3>{product.name}</h3>
         <p>{product.description}</p>
         <div className="price">{money(product.price)}</div>

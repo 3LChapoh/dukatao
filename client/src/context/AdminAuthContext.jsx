@@ -1,45 +1,93 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { usersApi } from '../api'
 
 const AdminAuthContext = createContext(null)
-const TOKEN_KEY = 'rc_admin_token'
-const ADMIN_KEY = 'rc_admin_profile'
 
 export function AdminAuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null)
-  const [admin, setAdmin] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(ADMIN_KEY) || 'null')
-    } catch {
-      return null
-    }
-  })
+  const [user, setUser] = useState(null)
 
-  async function login(email, password, securityKey) {
-    const { token: t, user } = await usersApi.adminLogin({ email, password, securityKey })
-    setToken(t)
-    setAdmin(user)
-    localStorage.setItem(TOKEN_KEY, t)
-    localStorage.setItem(ADMIN_KEY, JSON.stringify(user))
-    return user
+  const [token, setToken] = useState(
+    () => localStorage.getItem('adminToken') || ''
+  )
+
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('adminToken')
+
+    if (!storedToken) {
+      setLoading(false)
+      return
+    }
+
+    usersApi
+      .me(storedToken)
+      .then((currentUser) => {
+        if (currentUser?.role === 'admin') {
+          setUser(currentUser)
+          setToken(storedToken)
+        } else {
+          localStorage.removeItem('adminToken')
+          setToken('')
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('adminToken')
+        setToken('')
+        setUser(null)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
+  async function login(username, password) {
+    const result = await usersApi.adminLogin({
+      username,
+      password,
+    })
+
+    const loggedInUser = result?.user
+    const newToken = result?.token
+
+    if (loggedInUser?.role !== 'admin') {
+      throw new Error('This account is not an admin account')
+    }
+
+    if (!newToken) {
+      throw new Error('Admin login did not return a token')
+    }
+
+    localStorage.setItem('adminToken', newToken)
+
+    setToken(newToken)
+    setUser(loggedInUser)
+
+    return loggedInUser
   }
 
   function logout() {
-    setToken(null)
-    setAdmin(null)
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(ADMIN_KEY)
+    localStorage.removeItem('adminToken')
+    setToken('')
+    setUser(null)
   }
 
   return (
-    <AdminAuthContext.Provider value={{ token, admin, login, logout }}>
+    <AdminAuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        isAuthenticated: !!user && !!token,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AdminAuthContext.Provider>
   )
 }
 
 export function useAdminAuth() {
-  const ctx = useContext(AdminAuthContext)
-  if (!ctx) throw new Error('useAdminAuth must be used within an AdminAuthProvider')
-  return ctx
-}
+  return useContext(AdminAuthContext)
+}   
