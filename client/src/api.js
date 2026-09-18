@@ -82,6 +82,12 @@ export const ordersApi = {
   all: (token, status) => request(`/api/orders${status ? `?status=${status}` : ''}`, { token }),
   updateStatus: (id, status, token) =>
     request(`/api/orders/${id}/status`, { method: 'PUT', body: { status }, token }),
+  track: (orderId, email) =>
+    request(`/api/orders/track?orderId=${encodeURIComponent(orderId)}&email=${encodeURIComponent(email)}`),
+}
+
+export const statsApi = {
+  get: (token) => request('/api/stats', { token }),
 }
 
 export const configApi = {

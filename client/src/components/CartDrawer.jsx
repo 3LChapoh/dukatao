@@ -107,6 +107,12 @@ export default function CartDrawer({ onClose, onOrdersUpdated }) {
           Thank you — order <b>{placedOrder.order._id.slice(-7).toUpperCase()}</b> is confirmed. Speed things up by
           sending us the details directly:
         </div>
+        {!user && (
+          <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>
+            Save this order ID — you can check its status anytime from the account icon → "Track it here",
+            using this ID and {form.email}.
+          </p>
+        )}
         <div className="actions" style={{ flexDirection: 'column', gap: 10, marginTop: 14 }}>
           {waLink && (
             <a className="goldbtn" href={waLink} target="_blank" rel="noreferrer" style={{ textAlign: 'center' }}>

@@ -1,6 +1,6 @@
 import { useContact, whatsappLink, mailtoLink } from '../context/ContactContext'
 
-export default function Footer() {
+export default function Footer({ onOpenAccount }) {
   const { whatsapp, email } = useContact()
   const waLink = whatsappLink(whatsapp, 'Hi DukaTao, I have a question about an order.')
   const mailLink = mailtoLink(email, 'Question about DukaTao')
@@ -21,7 +21,9 @@ export default function Footer() {
           <div className="navlinks" style={{ flexDirection: 'column', gap: 8, marginTop: 10 }}>
             <a href="#collection">Collection</a>
             <a href="#categories">Categories</a>
-            <a href="#orders">Orders</a>
+            <button type="button" className="navlink-btn" onClick={onOpenAccount}>
+              Orders
+            </button>
           </div>
         </div>
         <div>

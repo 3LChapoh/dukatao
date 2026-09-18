@@ -274,6 +274,40 @@ async function cancelMyOrder(req, res) {
   }
 }
 
+// GET /api/orders/track?orderId=...&email=...
+// Public lookup for guest (and signed-in) customers who want to check status
+// without logging in. Requires the last-7 order ID plus the exact email used
+// at checkout, so it isn't a way to browse other people's orders.
+async function trackOrder(req, res) {
+  try {
+    const { orderId, email } = req.query
+
+    if (!orderId || !email) {
+      return res.status(400).json({ message: 'Order ID and email are required' })
+    }
+
+    const normalizedEmail = String(email).toLowerCase().trim()
+    const suffix = String(orderId).trim().toUpperCase()
+
+    if (suffix.length < 4) {
+      return res.status(400).json({ message: 'Enter more of the order ID' })
+    }
+
+    // Match on the last 7 characters customers actually see (order._id.slice(-7)),
+    // scoped to their email so this can't be used to enumerate other orders.
+    const candidates = await Order.find({ customerEmail: normalizedEmail }).sort({ createdAt: -1 })
+    const order = candidates.find((o) => o._id.toString().slice(-7).toUpperCase() === suffix)
+
+    if (!order) {
+      return res.status(404).json({ message: 'No order found matching that ID and email' })
+    }
+
+    res.json(order)
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to look up order', error: err.message })
+  }
+}
+
 async function restockOrder(order, session = null) {
   for (const item of order.items) {
     if (!mongoose.Types.ObjectId.isValid(item.product)) continue
@@ -298,4 +332,5 @@ module.exports = {
   getAllOrders,
   updateStatus,
   cancelMyOrder,
+  trackOrder,
 }

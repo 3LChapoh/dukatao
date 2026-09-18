@@ -78,14 +78,19 @@ export default function AdminProducts() {
       )}
       {loading && <div className="notice">Loading products…</div>}
       <div className="mini-grid">
-        {products.map((p) => (
+        {products.map((p) => {
+          const stockColor = p.stock === 0 ? '#f87171' : p.stock <= 5 ? '#c9a24b' : undefined
+          return (
           <div className="mini" key={p._id}>
             {p.images?.[0] && <img src={imageUrl(p.images[0].url)} alt="" style={{ width: '100%', borderRadius: 8, marginBottom: 6 }} />}
             <strong>{p.name}</strong>
             <br />
             <span className="muted">{p.category?.name || 'Uncategorized'}</span>
             <br />
-            <span className="mono">{money(p.price)}</span> · <span className="muted">{p.stock} in stock</span>
+            <span className="mono">{money(p.price)}</span> ·{' '}
+            <span className="muted" style={{ color: stockColor, fontWeight: stockColor ? 600 : undefined }}>
+              {p.stock === 0 ? 'Out of stock' : `${p.stock} in stock`}
+            </span>
             <div className="actions" style={{ marginTop: 8 }}>
               <button className="tiny" onClick={() => setEditing(p)}>
                 Edit
@@ -95,7 +100,8 @@ export default function AdminProducts() {
               </button>
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ const categoryRoutes = require('./routes/categoryRoutes')
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 const configRoutes = require('./routes/configRoutes')
+const statsRoutes = require('./routes/statsRoutes')
 
 const app = express()
 
@@ -25,6 +26,7 @@ app.use('/api/categories', categoryRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/config', configRoutes)
+app.use('/api/stats', statsRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'DukaTao API is running' })

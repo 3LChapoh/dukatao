@@ -72,7 +72,7 @@ function AppShell() {
         <ProductGrid initialCategory={pendingCategory} onCategoryConsumed={() => setPendingCategory(null)} />
       </main>
 
-      <Footer />
+      <Footer onOpenAccount={() => setDrawer('account')} />
 
       <BottomNav
         theme={theme}

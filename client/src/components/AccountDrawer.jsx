@@ -44,6 +44,9 @@ export default function AccountDrawer({ onClose, refreshKey }) {
   const [editing, setEditing] = useState(false)
   const [profileForm, setProfileForm] = useState({ name: '', phone: '', address: '' })
   const [savingProfile, setSavingProfile] = useState(false)
+  const [trackForm, setTrackForm] = useState({ orderId: '', email: '' })
+  const [trackBusy, setTrackBusy] = useState(false)
+  const [trackResult, setTrackResult] = useState(null) // null | 'not_found' | order
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -113,6 +116,21 @@ export default function AccountDrawer({ onClose, refreshKey }) {
     }
   }
 
+  async function submitTrack(e) {
+    e.preventDefault()
+    setTrackBusy(true)
+    setTrackResult(null)
+    try {
+      const order = await ordersApi.track(trackForm.orderId.trim(), trackForm.email.trim())
+      setTrackResult(order)
+    } catch (err) {
+      setTrackResult('not_found')
+      showToast(err.message || 'Could not find that order', true)
+    } finally {
+      setTrackBusy(false)
+    }
+  }
+
   async function cancelOrder(id) {
     try {
       await ordersApi.cancel(id, token)
@@ -121,6 +139,74 @@ export default function AccountDrawer({ onClose, refreshKey }) {
     } catch (err) {
       showToast(err.message || 'Could not cancel order', true)
     }
+  }
+
+  if (!user && mode === 'track') {
+    return (
+      <>
+        <div className="drawer-head">
+          <h2>Track your order</h2>
+          <button className="close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <p className="muted" style={{ fontSize: 12, marginBottom: 12 }}>
+          Placed an order without an account? Enter the order ID from your confirmation and the email
+          you checked out with.
+        </p>
+        <form className="form" onSubmit={submitTrack}>
+          <label>
+            Order ID
+            <input
+              className="field"
+              required
+              placeholder="e.g. A1B2C3D"
+              value={trackForm.orderId}
+              onChange={(e) => setTrackForm((f) => ({ ...f, orderId: e.target.value }))}
+            />
+          </label>
+          <label>
+            Email used at checkout
+            <input
+              className="field"
+              type="email"
+              required
+              value={trackForm.email}
+              onChange={(e) => setTrackForm((f) => ({ ...f, email: e.target.value }))}
+            />
+          </label>
+          <button className="goldbtn" disabled={trackBusy}>
+            {trackBusy ? 'Looking up…' : 'Track order'}
+          </button>
+        </form>
+
+        {trackResult === 'not_found' && (
+          <div className="notice" style={{ marginTop: 12 }}>
+            No order found with that ID and email. Double-check both and try again.
+          </div>
+        )}
+
+        {trackResult && trackResult !== 'not_found' && (
+          <div className="mini" style={{ marginTop: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong>{trackResult._id.slice(-7).toUpperCase()}</strong>
+              <StatusBadge status={trackResult.status} />
+            </div>
+            <span className="muted">{new Date(trackResult.createdAt).toLocaleDateString()}</span>
+            <br />
+            <b className="mono">{money(trackResult.total)}</b>
+            <br />
+            <small>
+              {trackResult.deliveryLocation} · {trackResult.paymentMethod}
+            </small>
+          </div>
+        )}
+
+        <button className="ghostbtn" style={{ marginTop: 16, width: '100%' }} onClick={() => setMode('login')}>
+          ← Back to sign in
+        </button>
+      </>
+    )
   }
 
   if (!user) {
@@ -170,6 +256,11 @@ export default function AccountDrawer({ onClose, refreshKey }) {
         <button className="ghostbtn" style={{ marginTop: 12, width: '100%' }} onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
           {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
         </button>
+        {mode === 'login' && (
+          <button className="navlink-btn" style={{ marginTop: 10, width: '100%' }} onClick={() => setMode('track')}>
+            Placed an order as a guest? Track it here
+          </button>
+        )}
       </>
     )
   }

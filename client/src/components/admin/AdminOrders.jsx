@@ -10,6 +10,7 @@ export default function AdminOrders() {
   const { token } = useAdminAuth()
   const showToast = useToast()
   const [filter, setFilter] = useState('')
+  const [search, setSearch] = useState('')
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -23,6 +24,15 @@ export default function AdminOrders() {
   }
 
   useEffect(reload, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const q = search.trim().toLowerCase()
+  const visibleOrders = q
+    ? orders.filter((o) =>
+        [o.customerName, o.customerPhone, o.customerEmail, o._id.slice(-7)]
+          .filter(Boolean)
+          .some((field) => field.toLowerCase().includes(q))
+      )
+    : orders
 
   async function updateStatus(id, status) {
     try {
@@ -46,10 +56,17 @@ export default function AdminOrders() {
           </button>
         ))}
       </div>
+      <input
+        className="field"
+        style={{ marginBottom: 14 }}
+        placeholder="Search by customer name, phone, email or order ID…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
       {loading && <div className="notice">Loading orders…</div>}
-      {!loading && !orders.length && <div className="notice">No orders match this filter.</div>}
+      {!loading && !visibleOrders.length && <div className="notice">No orders match this filter.</div>}
       <div className="mini-grid">
-        {orders.map((o) => (
+        {visibleOrders.map((o) => (
           <div className="mini" key={o._id}>
             <strong>{o._id.slice(-7).toUpperCase()}</strong>
             <span className="muted"> · {new Date(o.createdAt).toLocaleDateString()}</span>
