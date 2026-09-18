@@ -26,7 +26,7 @@ async function request(path, { method = 'GET', body, token, isForm = false } = {
 }
 
 // Builds multipart form data for product create/update (name, price, category,
-// description, stock, optional vendor override, plus image files).
+// description, stock, plus image files).
 function productFormData(fields, imageFiles) {
   const fd = new FormData()
   Object.entries(fields).forEach(([key, value]) => {
@@ -42,7 +42,6 @@ export const productsApi = {
     return request(`/api/products${qs ? `?${qs}` : ''}`)
   },
   get: (id) => request(`/api/products/${id}`),
-  mine: (token) => request('/api/products/mine', { token }),
   create: (fields, imageFiles, token) =>
     request('/api/products', { method: 'POST', body: productFormData(fields, imageFiles), token, isForm: true }),
   update: (id, fields, imageFiles, token) =>
@@ -56,44 +55,14 @@ export const productsApi = {
 }
 
 export const usersApi = {
-  register: (payload) =>
-    request('/api/users/register', {
-      method: 'POST',
-      body: payload,
-    }),
-
-  login: (payload) =>
-    request('/api/users/login', {
-      method: 'POST',
-      body: payload,
-    }),
-
-  adminLogin: (payload) =>
-    request('/api/users/admin-login', {
-      method: 'POST',
-      body: payload,
-    }),
-
-  me: (token) =>
-    request('/api/users/me', {
-      token,
-    }),
-
-  updateMe: (payload, token) =>
-    request('/api/users/me', {
-      method: 'PUT',
-      body: payload,
-      token,
-    }),
-
-  changePassword: (payload, token) =>
-    request('/api/users/change-password', {
-      method: 'PUT',
-      body: payload,
-      token,
-    }),
+  register: (payload) => request('/api/users/register', { method: 'POST', body: payload }),
+  login: (payload) => request('/api/users/login', { method: 'POST', body: payload }),
+  adminLogin: (payload) => request('/api/users/admin-login', { method: 'POST', body: payload }),
+  adminSignup: (payload) => request('/api/users/admin-signup', { method: 'POST', body: payload }),
+  adminResetPassword: (payload) => request('/api/users/admin-reset-password', { method: 'POST', body: payload }),
+  me: (token) => request('/api/users/me', { token }),
+  updateMe: (payload, token) => request('/api/users/me', { method: 'PUT', body: payload, token }),
 }
-
 
 export const ordersApi = {
   create: (payload, token) => request('/api/orders', { method: 'POST', body: payload, token }),

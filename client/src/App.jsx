@@ -93,7 +93,8 @@ function AppShell() {
   )
 }
 
-
+// Minimal hash router: '#/admin' loads its own portal with its own auth
+// session, entirely separate from the customer storefront below.
 export default function App() {
   const [route, setRoute] = useState(() => window.location.hash)
 
@@ -108,8 +109,8 @@ export default function App() {
   return (
     <ToastProvider>
       {route.startsWith('#/admin') ? (
-  <AdminPortal />
-) : (
+        <AdminPortal />
+      ) : (
         <AuthProvider>
           <FavouritesProvider>
             <CartProvider>

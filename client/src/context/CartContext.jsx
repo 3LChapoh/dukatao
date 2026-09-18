@@ -35,7 +35,6 @@ export function CartProvider({ children }) {
         {
           productId: product._id,
           name: product.name,
-          vendor: product.vendor,
           price: product.price,
           image: product.images?.[0]?.url,
           stock: product.stock,

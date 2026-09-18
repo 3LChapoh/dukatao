@@ -2,14 +2,7 @@ const mongoose = require('mongoose')
 const Order = require('../models/Order')
 const Product = require('../models/Product')
 
-const SHOP_NAME = 'DukaTao'
-
-const ORDER_STATUSES = [
-  'Pending',
-  'Processing',
-  'Completed',
-  'Cancelled',
-]
+const ORDER_STATUSES = ['Pending', 'Processing', 'Completed', 'Cancelled']
 
 function validQuantity(value) {
   const quantity = Number(value)
@@ -39,12 +32,7 @@ async function createOrder(req, res) {
         )
       }
 
-      if (
-        !customerName ||
-        !customerEmail ||
-        !deliveryLocation ||
-        !paymentMethod
-      ) {
+      if (!customerName || !customerEmail || !deliveryLocation || !paymentMethod) {
         throw Object.assign(
           new Error(
             'Customer name, email, delivery location and payment method are required'
@@ -102,17 +90,9 @@ async function createOrder(req, res) {
         orderItems.push({
           product: product._id,
           name: product.name,
-          vendor: product.vendor || SHOP_NAME,
           price: product.price,
           qty: quantity,
         })
-      }
-
-      if (!orderItems.length) {
-        throw Object.assign(
-          new Error('Order must contain at least one item'),
-          { status: 400 }
-        )
       }
 
       const [order] = await Order.create(
@@ -133,6 +113,7 @@ async function createOrder(req, res) {
 
             total,
             status: 'Pending',
+            paymentStatus: 'Pending',
           },
         ],
         { session }
@@ -217,18 +198,6 @@ async function updateStatus(req, res) {
       })
     }
 
-    if (order.status === 'Cancelled') {
-      return res.status(400).json({
-        message: 'Cancelled orders cannot be changed',
-      })
-    }
-
-    if (order.status === 'Completed' && status !== 'Completed') {
-      return res.status(400).json({
-        message: 'Completed orders cannot be moved backwards',
-      })
-    }
-
     if (status === 'Cancelled' && order.status !== 'Cancelled') {
       await restockOrder(order)
     }
@@ -240,7 +209,8 @@ async function updateStatus(req, res) {
     res.json(order)
   } catch (err) {
     res.status(400).json({
-      message: err.message || 'Failed to update order',
+      message: 'Failed to update order',
+      error: err.message,
     })
   }
 }
@@ -306,9 +276,7 @@ async function cancelMyOrder(req, res) {
 
 async function restockOrder(order, session = null) {
   for (const item of order.items) {
-    if (!mongoose.Types.ObjectId.isValid(item.product)) {
-      continue
-    }
+    if (!mongoose.Types.ObjectId.isValid(item.product)) continue
 
     const query = Product.findByIdAndUpdate(
       item.product,

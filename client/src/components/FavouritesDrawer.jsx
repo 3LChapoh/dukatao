@@ -31,9 +31,6 @@ export default function FavouritesDrawer({ onClose }) {
               <img src={imageUrl(p.images?.[0]?.url) || undefined} alt="" />
               <div>
                 <b className="serif">{p.name}</b>
-                <div className="muted" style={{ fontSize: 10 }}>
-                  {p.vendor}
-                </div>
                 <b className="mono" style={{ fontSize: 11 }}>
                   {money(p.price)}
                 </b>

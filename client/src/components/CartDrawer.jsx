@@ -10,7 +10,7 @@ const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
 const isValidKenyanPhone = (v) => /^(?:\+?254|0)7\d{8}$|^(?:\+?254|0)1\d{8}$/.test(v.trim().replace(/\s+/g, ''))
 
 function orderSummaryText(order, items) {
-  const lines = items.map((i) => `• ${i.qty} × ${i.name} (${i.vendor}) — ${money(i.price * i.qty)}`)
+  const lines = items.map((i) => `• ${i.qty} × ${i.name} — ${money(i.price * i.qty)}`)
   return [
     `New order ${order._id.slice(-7).toUpperCase()}`,
     `From: ${order.customerName} (${order.customerPhone})`,
@@ -192,9 +192,6 @@ export default function CartDrawer({ onClose, onOrdersUpdated }) {
               <img src={imageUrl(i.image) || undefined} alt="" />
               <div>
                 <b className="serif">{i.name}</b>
-                <div className="muted" style={{ fontSize: 10 }}>
-                  {i.vendor}
-                </div>
                 <div className="qty">
                   <button onClick={() => changeQty(i.productId, -1)}>−</button>
                   <span>{i.qty}</span>

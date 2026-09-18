@@ -4,7 +4,6 @@ const cors = require('cors')
 const connectDB = require('./config/db')
 const productRoutes = require('./routes/productRoutes')
 const userRoutes = require('./routes/userRoutes')
-
 const orderRoutes = require('./routes/orderRoutes')
 const configRoutes = require('./routes/configRoutes')
 
@@ -22,7 +21,6 @@ app.use(express.json())
 
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
-
 app.use('/api/orders', orderRoutes)
 app.use('/api/config', configRoutes)
 

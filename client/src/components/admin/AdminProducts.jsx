@@ -58,12 +58,7 @@ export default function AdminProducts() {
     return (
       <div className="mini-grid">
         <h3 style={{ fontSize: 14, marginBottom: 10 }}>{editing === 'new' ? 'Add product' : `Edit "${editing.name}"`}</h3>
-       <ProductForm
-  initial={editing === 'new' ? null : editing}
-  onSubmit={handleSubmit}
-  onCancel={() => setEditing(null)}
-  busy={busy}
-/>
+        <ProductForm initial={editing === 'new' ? null : editing} onSubmit={handleSubmit} onCancel={() => setEditing(null)} busy={busy} />
       </div>
     )
   }
@@ -81,8 +76,6 @@ export default function AdminProducts() {
           <div className="mini" key={p._id}>
             {p.images?.[0] && <img src={imageUrl(p.images[0].url)} alt="" style={{ width: '100%', borderRadius: 8, marginBottom: 6 }} />}
             <strong>{p.name}</strong>
-            <br />
-            <span className="muted">{p.vendor}</span>
             <br />
             <span className="mono">{money(p.price)}</span> · <span className="muted">{p.stock} in stock</span>
             <div className="actions" style={{ marginTop: 8 }}>

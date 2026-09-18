@@ -7,11 +7,6 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Product name is required'],
       trim: true,
     },
-    vendor: {
-      type: String,
-      required: [true, 'DukaTao shop name is required'],
-      trim: true,
-    },
     price: {
       type: Number,
       required: [true, 'Price (KES) is required'],

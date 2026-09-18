@@ -7,28 +7,16 @@ const orderItemSchema = new mongoose.Schema(
       ref: 'Product',
       required: true,
     },
-
     name: {
       type: String,
       required: true,
       trim: true,
     },
-
-    // Kept temporarily for compatibility with existing product/order data.
-    // All new DukaTao products use vendor: "DukaTao".
-    vendor: {
-      type: String,
-      required: true,
-      trim: true,
-      default: 'DukaTao',
-    },
-
     price: {
       type: Number,
       required: true,
       min: 0,
     },
-
     qty: {
       type: Number,
       required: true,
@@ -93,6 +81,12 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['Pending', 'Processing', 'Completed', 'Cancelled'],
+      default: 'Pending',
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ['Pending', 'Paid', 'Failed'],
       default: 'Pending',
     },
   },

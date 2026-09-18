@@ -13,8 +13,8 @@ async function getConfig(req, res) {
   try {
     const settings = await getOrCreateSettings()
     res.json({
-      whatsapp: process.env.RUBYS_CHOICE_WHATSAPP || '',
-      email: process.env.RUBYS_CHOICE_EMAIL || '',
+      whatsapp: process.env.DUKATAO_WHATSAPP || '',
+      email: process.env.DUKATAO_EMAIL || '',
       heroImages: settings.heroImages,
     })
   } catch (err) {

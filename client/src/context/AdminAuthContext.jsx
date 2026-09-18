@@ -1,93 +1,68 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { usersApi } from '../api'
 
 const AdminAuthContext = createContext(null)
+const TOKEN_KEY = 'rc_admin_token'
+const ADMIN_KEY = 'rc_admin_profile'
 
 export function AdminAuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-
-  const [token, setToken] = useState(
-    () => localStorage.getItem('adminToken') || ''
-  )
-
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem('adminToken')
-
-    if (!storedToken) {
-      setLoading(false)
-      return
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null)
+  const [admin, setAdmin] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(ADMIN_KEY) || 'null')
+    } catch {
+      return null
     }
+  })
 
-    usersApi
-      .me(storedToken)
-      .then((currentUser) => {
-        if (currentUser?.role === 'admin') {
-          setUser(currentUser)
-          setToken(storedToken)
-        } else {
-          localStorage.removeItem('adminToken')
-          setToken('')
-        }
-      })
-      .catch(() => {
-        localStorage.removeItem('adminToken')
-        setToken('')
-        setUser(null)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [])
+  function persist(t, user) {
+    setToken(t)
+    setAdmin(user)
+    localStorage.setItem(TOKEN_KEY, t)
+    localStorage.setItem(ADMIN_KEY, JSON.stringify(user))
+  }
 
   async function login(username, password) {
-    const result = await usersApi.adminLogin({
+    const { token: t, user } = await usersApi.adminLogin({ username, password })
+    persist(t, user)
+    return user
+  }
+
+  // Returns { user, recoveryCode } — the caller must show the recovery code
+  // to the admin immediately; it is never retrievable again.
+  async function signup(name, username, password) {
+    const { token: t, user, recoveryCode } = await usersApi.adminSignup({ name, username, password })
+    persist(t, user)
+    return { user, recoveryCode }
+  }
+
+  // Returns the new one-time recoveryCode to display once. Does not log the
+  // admin in — they still sign in with their new password afterward.
+  async function resetPassword(username, recoveryCode, newPassword) {
+    const { recoveryCode: newCode } = await usersApi.adminResetPassword({
       username,
-      password,
+      recoveryCode,
+      newPassword,
     })
-
-    const loggedInUser = result?.user
-    const newToken = result?.token
-
-    if (loggedInUser?.role !== 'admin') {
-      throw new Error('This account is not an admin account')
-    }
-
-    if (!newToken) {
-      throw new Error('Admin login did not return a token')
-    }
-
-    localStorage.setItem('adminToken', newToken)
-
-    setToken(newToken)
-    setUser(loggedInUser)
-
-    return loggedInUser
+    return newCode
   }
 
   function logout() {
-    localStorage.removeItem('adminToken')
-    setToken('')
-    setUser(null)
+    setToken(null)
+    setAdmin(null)
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(ADMIN_KEY)
   }
 
   return (
-    <AdminAuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        isAuthenticated: !!user && !!token,
-        login,
-        logout,
-      }}
-    >
+    <AdminAuthContext.Provider value={{ token, admin, login, signup, resetPassword, logout }}>
       {children}
     </AdminAuthContext.Provider>
   )
 }
 
 export function useAdminAuth() {
-  return useContext(AdminAuthContext)
-}   
+  const ctx = useContext(AdminAuthContext)
+  if (!ctx) throw new Error('useAdminAuth must be used within an AdminAuthProvider')
+  return ctx
+}
