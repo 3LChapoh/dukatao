@@ -6,30 +6,16 @@ import { FavouritesProvider } from './context/FavouritesContext'
 import { ContactProvider } from './context/ContactContext'
 import { productsApi, configApi } from './api'
 
-import Header from './components/Header'
+import SiteChrome from './components/SiteChrome'
 import Hero from './components/Hero'
 import CategoryStrip from './components/CategoryStrip'
-import ProductGrid from './components/ProductGrid'
-import Footer from './components/Footer'
-import BottomNav from './components/BottomNav'
-import DrawerOverlay from './components/DrawerOverlay'
-import CartDrawer from './components/CartDrawer'
-import AccountDrawer from './components/AccountDrawer'
-import FavouritesDrawer from './components/FavouritesDrawer'
+import FeaturedProducts from './components/FeaturedProducts'
 import AdminPortal from './pages/AdminPortal'
+import AllProductsPage from './pages/AllProductsPage'
 
-function AppShell() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('dukatao_theme') || 'dark')
-  const [drawer, setDrawer] = useState(null) // 'cart' | 'account' | 'favourites' | null
-  const [pendingCategory, setPendingCategory] = useState(null)
-  const [ordersRefreshKey, setOrdersRefreshKey] = useState(0)
+function HomePage() {
   const [stats, setStats] = useState({ products: '—' })
   const [heroImages, setHeroImages] = useState([])
-
-  useEffect(() => {
-    document.body.classList.toggle('light', theme === 'light')
-    localStorage.setItem('dukatao_theme', theme)
-  }, [theme])
 
   useEffect(() => {
     productsApi
@@ -50,51 +36,23 @@ function AppShell() {
       .catch(() => {})
   }, [])
 
-  function closeDrawer() {
-    setDrawer(null)
+  // Category strip sends customers straight to the full products page,
+  // pre-filtered to the category they tapped.
+  function goToCategory(categoryId) {
+    window.location.hash = `#/products?category=${encodeURIComponent(categoryId)}`
   }
 
   return (
-    <>
-      <a className="skip-link" href="#collection">
-        Skip to collection
-      </a>
-      <Header
-        theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
-        onOpenCart={() => setDrawer('cart')}
-        onOpenAccount={() => setDrawer('account')}
-      />
-
-      <main>
-        <Hero stats={stats} heroImages={heroImages} />
-        <CategoryStrip onSelect={(id) => setPendingCategory(id)} />
-        <ProductGrid initialCategory={pendingCategory} onCategoryConsumed={() => setPendingCategory(null)} />
-      </main>
-
-      <Footer onOpenAccount={() => setDrawer('account')} />
-
-      <BottomNav
-        theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
-        onOpenCart={() => setDrawer('cart')}
-        onOpenAccount={() => setDrawer('account')}
-        onOpenFavourites={() => setDrawer('favourites')}
-      />
-
-      <DrawerOverlay open={!!drawer} onClose={closeDrawer}>
-        {drawer === 'cart' && (
-          <CartDrawer onClose={closeDrawer} onOrdersUpdated={() => setOrdersRefreshKey((k) => k + 1)} />
-        )}
-        {drawer === 'account' && <AccountDrawer onClose={closeDrawer} refreshKey={ordersRefreshKey} />}
-        {drawer === 'favourites' && <FavouritesDrawer onClose={closeDrawer} />}
-      </DrawerOverlay>
-    </>
+    <SiteChrome>
+      <Hero stats={stats} heroImages={heroImages} />
+      <CategoryStrip onSelect={goToCategory} />
+      <FeaturedProducts />
+    </SiteChrome>
   )
 }
 
 // Minimal hash router: '#/admin' loads its own portal with its own auth
-// session, entirely separate from the customer storefront below.
+// session; '#/products' is the full catalog page. Anything else is home.
 export default function App() {
   const [route, setRoute] = useState(() => window.location.hash)
 
@@ -115,7 +73,7 @@ export default function App() {
           <FavouritesProvider>
             <CartProvider>
               <ContactProvider>
-                <AppShell />
+                {route.startsWith('#/products') ? <AllProductsPage /> : <HomePage />}
               </ContactProvider>
             </CartProvider>
           </FavouritesProvider>
