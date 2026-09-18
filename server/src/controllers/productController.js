@@ -1,5 +1,6 @@
 const cloudinary = require('../config/cloudinary')
 const Product = require('../models/Product')
+const Category = require('../models/Category')
 
 function deleteImageFiles(images = []) {
   images.forEach(({ publicId }) => {
@@ -23,7 +24,7 @@ async function getProducts(req, res) {
     if (category) filter.category = category
     if (search) filter.name = { $regex: search, $options: 'i' }
 
-    let query = Product.find(filter)
+    let query = Product.find(filter).populate('category', 'name slug color')
 
     if (sort === 'low') query = query.sort({ price: 1 })
     else if (sort === 'high') query = query.sort({ price: -1 })
@@ -40,7 +41,7 @@ async function getProducts(req, res) {
 // GET /api/products/:id
 async function getProductById(req, res) {
   try {
-    const product = await Product.findById(req.params.id)
+    const product = await Product.findById(req.params.id).populate('category', 'name slug color')
     if (!product) return res.status(404).json({ message: 'Product not found' })
     res.json(product)
   } catch (err) {
@@ -53,6 +54,12 @@ async function createProduct(req, res) {
   try {
     const { name, price, category, description, stock } = req.body
 
+    const categoryDoc = await Category.findById(category)
+    if (!categoryDoc) {
+      if (req.files?.length) deleteImageFiles(filesToImages(req.files))
+      return res.status(400).json({ message: 'Selected category does not exist' })
+    }
+
     const images = filesToImages(req.files)
 
     const product = await Product.create({
@@ -63,6 +70,8 @@ async function createProduct(req, res) {
       stock,
       images,
     })
+
+    await product.populate('category', 'name slug color')
 
     res.status(201).json(product)
   } catch (err) {
@@ -82,7 +91,14 @@ async function updateProduct(req, res) {
 
     if (name !== undefined) product.name = name
     if (price !== undefined) product.price = price
-    if (category !== undefined) product.category = category
+    if (category !== undefined) {
+      const categoryDoc = await Category.findById(category)
+      if (!categoryDoc) {
+        if (req.files?.length) deleteImageFiles(filesToImages(req.files))
+        return res.status(400).json({ message: 'Selected category does not exist' })
+      }
+      product.category = category
+    }
     if (description !== undefined) product.description = description
     if (stock !== undefined) product.stock = stock
 
@@ -100,6 +116,7 @@ async function updateProduct(req, res) {
     }
 
     await product.save()
+    await product.populate('category', 'name slug color')
     res.json(product)
   } catch (err) {
     if (req.files?.length) deleteImageFiles(filesToImages(req.files))

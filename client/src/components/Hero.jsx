@@ -1,10 +1,10 @@
 export default function Hero({ stats, heroImages = [] }) {
   const fallbackImages = [
-    'https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&h=800&q=80&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1583845112203-29329902332e?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1616627561950-9f746e330187?w=600&h=800&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&h=800&q=80&auto=format&fit=crop',
   ]
 
   const images = heroImages.length > 0 ? heroImages : fallbackImages
@@ -24,7 +24,7 @@ export default function Hero({ stats, heroImages = [] }) {
             >
               <img
                 src={src}
-                alt="Fine fragrance"
+                alt="Household product"
                 loading={i === 0 ? 'eager' : 'lazy'}
               />
             </div>
@@ -36,16 +36,16 @@ export default function Hero({ stats, heroImages = [] }) {
 
       <div className="hero-copy">
         <div className="eyebrow">
-          Nairobi's house of fine fragrance
+          DukaTao — Kenya's home essentials shop
         </div>
 
         <h1>
-          Wear something <em>unforgettable.</em>
+          Everything your home <em>needs.</em>
         </h1>
 
         <p>
-          A considered house of fine perfume, rare attars and beautiful
-          scent rituals from Nairobi.
+          Kitchen, cleaning, storage, electronics and more — quality
+          household products delivered across Kenya, pay on delivery.
         </p>
 
         <div className="cta">
@@ -63,8 +63,8 @@ export default function Hero({ stats, heroImages = [] }) {
 
         <div className="hero-stats">
           <div className="stat">
-            <strong>{stats.fragrances}</strong>
-            <span>Fragrances</span>
+            <strong>{stats.products}</strong>
+            <span>Products</span>
           </div>
 
           <div className="stat">

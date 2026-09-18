@@ -2,18 +2,18 @@ import { useContact, whatsappLink, mailtoLink } from '../context/ContactContext'
 
 export default function Footer() {
   const { whatsapp, email } = useContact()
-  const waLink = whatsappLink(whatsapp, "Hi Ruby's Choice, I have a question about an order.")
-  const mailLink = mailtoLink(email, "Question about Ruby's Choice")
+  const waLink = whatsappLink(whatsapp, 'Hi DukaTao, I have a question about an order.')
+  const mailLink = mailtoLink(email, 'Question about DukaTao')
 
   return (
     <footer className="footer">
       <div className="wrap footer-grid">
         <div>
           <div className="logo">
-            Ruby's <span>Choice</span>
+            Duka<span>Tao</span>
           </div>
           <p className="muted" style={{ fontSize: 12, maxWidth: 320 }}>
-            A single boutique for fine fragrance, curated with people who love beautiful scent in mind.
+            Household products for Kenyan homes — kitchen, cleaning, storage, electronics and more.
           </p>
         </div>
         <div>
@@ -37,7 +37,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="wrap muted" style={{ fontSize: 11, paddingTop: 20 }}>
-        © {new Date().getFullYear()} Boniface | Omae. <a href="#/admin">Admin</a>
+        © {new Date().getFullYear()} DukaTao. <a href="#/admin">Admin</a>
       </div>
     </footer>
   )

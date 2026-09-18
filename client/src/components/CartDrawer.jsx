@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { imageUrl, ordersApi } from '../api'
-import { money } from '../data/categories'
+import { money } from '../utils'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'

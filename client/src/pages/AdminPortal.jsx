@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AdminAuthProvider, useAdminAuth } from '../context/AdminAuthContext'
 import AdminAuthGate from '../components/admin/AdminAuthGate'
 import AdminProducts from '../components/admin/AdminProducts'
+import AdminCategories from '../components/admin/AdminCategories'
 import AdminOrders from '../components/admin/AdminOrders'
 import AdminHero from '../components/admin/AdminHero'
 
@@ -14,7 +15,7 @@ function Dashboard() {
       <div className="section-head">
         <div>
           <div className="eyebrow">Admin</div>
-          <h2 className="serif">Ruby's Choice control room</h2>
+          <h2 className="serif">DukaTao control room</h2>
         </div>
         <button className="ghostbtn" onClick={logout}>
           Sign out ({admin.name})
@@ -24,6 +25,9 @@ function Dashboard() {
         <button className={`tab${tab === 'products' ? ' active' : ''}`} onClick={() => setTab('products')}>
           Products
         </button>
+        <button className={`tab${tab === 'categories' ? ' active' : ''}`} onClick={() => setTab('categories')}>
+          Categories
+        </button>
         <button className={`tab${tab === 'orders' ? ' active' : ''}`} onClick={() => setTab('orders')}>
           Orders
         </button>
@@ -32,6 +36,7 @@ function Dashboard() {
         </button>
       </div>
       {tab === 'products' && <AdminProducts />}
+      {tab === 'categories' && <AdminCategories />}
       {tab === 'orders' && <AdminOrders />}
       {tab === 'hero' && <AdminHero />}
     </section>

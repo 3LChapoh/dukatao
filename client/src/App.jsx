@@ -23,7 +23,7 @@ function AppShell() {
   const [drawer, setDrawer] = useState(null) // 'cart' | 'account' | 'favourites' | null
   const [pendingCategory, setPendingCategory] = useState(null)
   const [ordersRefreshKey, setOrdersRefreshKey] = useState(0)
-  const [stats, setStats] = useState({ fragrances: '—' })
+  const [stats, setStats] = useState({ products: '—' })
   const [heroImages, setHeroImages] = useState([])
 
   useEffect(() => {
@@ -36,7 +36,7 @@ function AppShell() {
       .list()
       .then((data) => {
         if (!Array.isArray(data)) return
-        setStats({ fragrances: data.length })
+        setStats({ products: data.length })
       })
       .catch(() => {})
   }, [])

@@ -5,7 +5,7 @@ const cloudinary = require('../config/cloudinary')
 const productStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'rubys-choice/products',
+    folder: 'dukatao/products',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     transformation: [{ width: 1600, height: 2000, crop: 'limit' }],
   },
@@ -14,7 +14,7 @@ const productStorage = new CloudinaryStorage({
 const heroStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'rubys-choice/hero',
+    folder: 'dukatao/hero',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     transformation: [{ width: 1200, height: 1600, crop: 'limit' }],
   },

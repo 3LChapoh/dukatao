@@ -36,6 +36,17 @@ function productFormData(fields, imageFiles) {
   return fd
 }
 
+export const categoriesApi = {
+  // Public storefront calls list() with no token → active categories only.
+  // Admin screens pass a token → includes inactive categories too.
+  list: (token) => request('/api/categories' + (token ? '?all=true' : ''), { token }),
+  get: (id) => request(`/api/categories/${id}`),
+  create: (payload, token) => request('/api/categories', { method: 'POST', body: payload, token }),
+  update: (id, payload, token) => request(`/api/categories/${id}`, { method: 'PUT', body: payload, token }),
+  remove: (id, token) => request(`/api/categories/${id}`, { method: 'DELETE', token }),
+  reorder: (orderedIds, token) => request('/api/categories/reorder', { method: 'PUT', body: { orderedIds }, token }),
+}
+
 export const productsApi = {
   list: (params = {}) => {
     const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v)).toString()

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { imageUrl, productsApi } from '../api'
-import { money } from '../data/categories'
+import { money } from '../utils'
 import { useFavourites } from '../context/FavouritesContext'
 import { useCart } from '../context/CartContext'
 
@@ -47,7 +47,7 @@ export default function FavouritesDrawer({ onClose }) {
           )
         })
       ) : (
-        <div className="notice">Tap the heart on any fragrance to save it here.</div>
+        <div className="notice">Tap the heart on any product to save it here.</div>
       )}
     </>
   )

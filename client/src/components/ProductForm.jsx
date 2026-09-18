@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { categories } from '../data/categories'
 
-const empty = { name: '', price: '', category: categories[0].id, description: '', stock: '' }
-
-export default function ProductForm({ initial, onSubmit, onCancel, busy }) {
-  const [form, setForm] = useState(() => ({ ...empty, ...initial }))
+export default function ProductForm({ initial, categories, onSubmit, onCancel, busy }) {
+  const empty = { name: '', price: '', category: categories[0]?._id || '', description: '', stock: '' }
+  const [form, setForm] = useState(() => ({
+    ...empty,
+    ...initial,
+    category: initial?.category?._id || initial?.category || empty.category,
+  }))
   const [files, setFiles] = useState([])
   const [replaceImages, setReplaceImages] = useState(false)
 
@@ -29,13 +31,19 @@ export default function ProductForm({ initial, onSubmit, onCancel, busy }) {
       </label>
       <label>
         Category
-        <select className="field" value={form.category} onChange={(e) => update('category', e.target.value)}>
-          {categories.map((c) => (
-            <option value={c.id} key={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        {categories.length === 0 ? (
+          <span className="muted" style={{ fontSize: 12 }}>
+            No categories yet — add one in the Categories tab first.
+          </span>
+        ) : (
+          <select className="field" required value={form.category} onChange={(e) => update('category', e.target.value)}>
+            {categories.map((c) => (
+              <option value={c._id} key={c._id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        )}
       </label>
       <label>
         Stock
@@ -56,7 +64,7 @@ export default function ProductForm({ initial, onSubmit, onCancel, busy }) {
         </label>
       )}
       <div className="actions">
-        <button className="goldbtn" disabled={busy}>
+        <button className="goldbtn" disabled={busy || categories.length === 0}>
           {busy ? 'Saving…' : initial?._id ? 'Save changes' : 'Add product'}
         </button>
         {onCancel && (

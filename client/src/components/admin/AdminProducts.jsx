@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { imageUrl, productsApi } from '../../api'
-import { money } from '../../data/categories'
+import { imageUrl, productsApi, categoriesApi } from '../../api'
+import { money } from '../../utils'
 import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useToast } from '../../context/ToastContext'
 import ProductForm from '../ProductForm'
@@ -9,15 +9,18 @@ export default function AdminProducts() {
   const { token } = useAdminAuth()
   const showToast = useToast()
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null) // null | 'new' | product
   const [busy, setBusy] = useState(false)
 
   function reload() {
     setLoading(true)
-    productsApi
-      .list()
-      .then(setProducts)
+    Promise.all([productsApi.list(), categoriesApi.list(token)])
+      .then(([productList, categoryList]) => {
+        setProducts(productList)
+        setCategories(categoryList)
+      })
       .catch((err) => showToast(err.message, true))
       .finally(() => setLoading(false))
   }
@@ -58,7 +61,7 @@ export default function AdminProducts() {
     return (
       <div className="mini-grid">
         <h3 style={{ fontSize: 14, marginBottom: 10 }}>{editing === 'new' ? 'Add product' : `Edit "${editing.name}"`}</h3>
-        <ProductForm initial={editing === 'new' ? null : editing} onSubmit={handleSubmit} onCancel={() => setEditing(null)} busy={busy} />
+        <ProductForm initial={editing === 'new' ? null : editing} categories={categories} onSubmit={handleSubmit} onCancel={() => setEditing(null)} busy={busy} />
       </div>
     )
   }
@@ -66,16 +69,21 @@ export default function AdminProducts() {
   return (
     <div>
       <div className="actions" style={{ marginBottom: 14 }}>
-        <button className="goldbtn" onClick={() => setEditing('new')}>
+        <button className="goldbtn" onClick={() => setEditing('new')} disabled={categories.length === 0}>
           + Add product
         </button>
       </div>
+      {!loading && categories.length === 0 && (
+        <div className="notice">Add a category first (Categories tab) before adding products.</div>
+      )}
       {loading && <div className="notice">Loading products…</div>}
       <div className="mini-grid">
         {products.map((p) => (
           <div className="mini" key={p._id}>
             {p.images?.[0] && <img src={imageUrl(p.images[0].url)} alt="" style={{ width: '100%', borderRadius: 8, marginBottom: 6 }} />}
             <strong>{p.name}</strong>
+            <br />
+            <span className="muted">{p.category?.name || 'Uncategorized'}</span>
             <br />
             <span className="mono">{money(p.price)}</span> · <span className="muted">{p.stock} in stock</span>
             <div className="actions" style={{ marginTop: 8 }}>

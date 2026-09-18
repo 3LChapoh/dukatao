@@ -1,9 +1,9 @@
 import { imageUrl } from '../api'
-import { categoryFor, money } from '../data/categories'
+import { money } from '../utils'
 import { useCart } from '../context/CartContext'
 
 const DEFAULT_IMG =
-  'https://images.unsplash.com/photo-QkC2gICf0zc?w=800&h=1000&q=80&auto=format&fit=crop'
+  'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&h=1000&q=80&auto=format&fit=crop'
 
 function stockLabel(stock) {
   if (stock <= 0) return 'Out of stock'
@@ -13,7 +13,7 @@ function stockLabel(stock) {
 
 export default function ProductCard({ product, isFavourite, onToggleFavourite }) {
   const { addItem } = useCart()
-  const cat = categoryFor((product.category || '').toLowerCase().trim())
+  const cat = product.category || { name: 'Uncategorized', color: '#888' }
   const out = product.stock <= 0
   const img = imageUrl(product.images?.[0]?.url) || DEFAULT_IMG
   const altImg = imageUrl(product.images?.[1]?.url)

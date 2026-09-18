@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { productsApi } from '../api'
-import { categories } from '../data/categories'
+import { productsApi, categoriesApi } from '../api'
 import { useFavourites } from '../context/FavouritesContext'
 import ProductCard from './ProductCard'
 
@@ -8,6 +7,7 @@ const PAGE_SIZES = [8, 16, 24, 32]
 
 export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -29,10 +29,12 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    productsApi
-      .list()
-      .then((data) => {
-        if (!cancelled) setProducts(Array.isArray(data) ? data : [])
+    Promise.all([productsApi.list(), categoriesApi.list()])
+      .then(([productList, categoryList]) => {
+        if (!cancelled) {
+          setProducts(Array.isArray(productList) ? productList : [])
+          setCategories(Array.isArray(categoryList) ? categoryList : [])
+        }
       })
       .catch((err) => {
         if (!cancelled) setError(err.message)
@@ -50,7 +52,7 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
     let list = products.filter(
       (p) =>
         (!q || `${p.name} ${p.description || ''}`.toLowerCase().includes(q)) &&
-        (!category || (p.category || '').toLowerCase().trim() === category)
+        (!category || p.category?._id === category)
     )
     if (sort === 'low') list = [...list].sort((a, b) => a.price - b.price)
     else if (sort === 'high') list = [...list].sort((a, b) => b.price - a.price)
@@ -66,18 +68,18 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
     <section id="collection" className="wrap reveal in">
       <div className="section-head">
         <div>
-          <div className="eyebrow">Curated in Nairobi</div>
+          <div className="eyebrow">Curated for your home</div>
           <h2>The collection</h2>
         </div>
         <span className="muted" style={{ fontSize: 11 }}>
-          {filtered.length} fragrances
+          {filtered.length} products
         </span>
       </div>
 
       <div className="controls">
         <input
           className="field search"
-          placeholder="Search perfume, oud…"
+          placeholder="Search products…"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -94,7 +96,7 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
         >
           <option value="">All categories</option>
           {categories.map((c) => (
-            <option value={c.id} key={c.id}>
+            <option value={c._id} key={c._id}>
               {c.name}
             </option>
           ))}
@@ -142,7 +144,7 @@ export default function ProductGrid({ initialCategory, onCategoryConsumed }) {
               ))
             ) : (
               <div className="notice" style={{ gridColumn: '1/-1' }}>
-                No fragrance matched your search. Try another note or category.
+                No products matched your search. Try another term or category.
               </div>
             )}
           </div>

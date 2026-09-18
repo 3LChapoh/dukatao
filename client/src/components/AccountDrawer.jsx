@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ordersApi } from '../api'
-import { money } from '../data/categories'
+import { money } from '../utils'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import PasswordField from './PasswordField'
