@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { usersApi } from '../api'
 
 const AuthContext = createContext(null)
-const TOKEN_KEY = 'rc_token'
-const USER_KEY = 'rc_user'
+const TOKEN_KEY = 'dukatao_token'
+const USER_KEY = 'dukatao_user'
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null)

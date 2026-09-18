@@ -2,8 +2,8 @@ import { createContext, useContext, useState } from 'react'
 import { usersApi } from '../api'
 
 const AdminAuthContext = createContext(null)
-const TOKEN_KEY = 'rc_admin_token'
-const ADMIN_KEY = 'rc_admin_profile'
+const TOKEN_KEY = 'dukatao_admin_token'
+const ADMIN_KEY = 'dukatao_admin_profile'
 
 export function AdminAuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || null)

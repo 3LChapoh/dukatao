@@ -19,7 +19,7 @@ import FavouritesDrawer from './components/FavouritesDrawer'
 import AdminPortal from './pages/AdminPortal'
 
 function AppShell() {
-  const [theme, setTheme] = useState(() => localStorage.getItem('rc_theme') || 'dark')
+  const [theme, setTheme] = useState(() => localStorage.getItem('dukatao_theme') || 'dark')
   const [drawer, setDrawer] = useState(null) // 'cart' | 'account' | 'favourites' | null
   const [pendingCategory, setPendingCategory] = useState(null)
   const [ordersRefreshKey, setOrdersRefreshKey] = useState(0)
@@ -28,7 +28,7 @@ function AppShell() {
 
   useEffect(() => {
     document.body.classList.toggle('light', theme === 'light')
-    localStorage.setItem('rc_theme', theme)
+    localStorage.setItem('dukatao_theme', theme)
   }, [theme])
 
   useEffect(() => {

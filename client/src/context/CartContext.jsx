@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { useToast } from './ToastContext'
 
 const CartContext = createContext(null)
-const CART_KEY = 'rc_cart'
+const CART_KEY = 'dukatao_cart'
 
 export function CartProvider({ children }) {
   const showToast = useToast()

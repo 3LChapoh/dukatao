@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
 const FavouritesContext = createContext(null)
-const KEY = 'rc_favourites'
+const KEY = 'dukatao_favourites'
 
 export function FavouritesProvider({ children }) {
   const [ids, setIds] = useState(() => {

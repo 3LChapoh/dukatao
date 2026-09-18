@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import PasswordField from './PasswordField'
 
-const PHONE_RE = /^(?:\+254|254|0)7\d{8}$/
+const PHONE_RE = /^(?:\+?254|0)7\d{8}$|^(?:\+?254|0)1\d{8}$/
 
 const STATUS_STYLES = {
   Pending: { bg: '#c9a24b22', color: '#c9a24b' },
@@ -74,7 +74,7 @@ export default function AccountDrawer({ onClose, refreshKey }) {
         return
       }
       if (form.phone && !PHONE_RE.test(form.phone.replace(/\s/g, ''))) {
-        showToast('Enter a valid Kenyan phone number, e.g. 07XX XXX XXX', true)
+        showToast('Enter a valid Kenyan phone number, e.g. 07XX XXX XXX or 01XX XXX XXX', true)
         return
       }
     }
@@ -98,7 +98,7 @@ export default function AccountDrawer({ onClose, refreshKey }) {
   async function saveProfile(e) {
     e.preventDefault()
     if (profileForm.phone && !PHONE_RE.test(profileForm.phone.replace(/\s/g, ''))) {
-      showToast('Enter a valid Kenyan phone number, e.g. 07XX XXX XXX', true)
+      showToast('Enter a valid Kenyan phone number, e.g. 07XX XXX XXX or 01XX XXX XXX', true)
       return
     }
     setSavingProfile(true)
