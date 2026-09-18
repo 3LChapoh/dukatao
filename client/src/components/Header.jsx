@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 
@@ -6,10 +6,17 @@ export default function Header({ theme, onToggleTheme, onOpenCart, onOpenAccount
   const { user } = useAuth()
   const { count } = useCart()
   const [scrolled, setScrolled] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const lastY = useRef(0)
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > 80)
+      const y = window.scrollY
+      setScrolled(y > 80)
+      // Fade the bar away while scrolling down past the fold, bring it back
+      // as soon as the user scrolls up (or is near the top).
+      setHidden(y > 140 && y > lastY.current)
+      lastY.current = y
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
@@ -17,7 +24,7 @@ export default function Header({ theme, onToggleTheme, onOpenCart, onOpenAccount
   }, [])
 
   return (
-    <header className={`nav${scrolled ? ' scrolled' : ''}`}>
+    <header className={`nav${scrolled ? ' scrolled' : ''}${hidden ? ' nav-hidden' : ''}`}>
       <div className="wrap nav-inner">
         <a className="logo" href="#home">
           Duka<span>Tao</span>
