@@ -39,7 +39,7 @@ export default function Footer({ onOpenAccount }) {
         </div>
       </div>
       <div className="wrap muted" style={{ fontSize: 11, paddingTop: 20 }}>
-        © {new Date().getFullYear()} DukaTao. <a href="#/admin">Admin</a>
+        © {new Date().getFullYear()} Boniface | Omae. <a href="#/admin">Admin</a>
       </div>
     </footer>
   )

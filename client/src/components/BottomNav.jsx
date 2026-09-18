@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext'
 import { useFavourites } from '../context/FavouritesContext'
+import { useScrollNav } from '../hooks/useScrollNav'
 
 const RADIUS = 22
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
@@ -8,26 +8,16 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 export default function BottomNav({ theme, onToggleTheme, onOpenCart, onOpenAccount, onOpenFavourites }) {
   const { count } = useCart()
   const { ids: favourites } = useFavourites()
-  const [scrolled, setScrolled] = useState(false)
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 80)
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const pct = docHeight > 0 ? Math.min(window.scrollY / docHeight, 1) : 0
-      setProgress(pct)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const { scrolled, hidden, progress } = useScrollNav()
 
   const dashoffset = CIRCUMFERENCE * (1 - progress)
+  // Mirrors the top nav's fade: visible once scrolled, but tucks away
+  // together with it while scrolling down, and returns together on scroll up.
+  const showBottomNav = scrolled && !hidden
 
   return (
     <>
-      <nav className={`bottom-nav${scrolled ? ' show' : ''}`} aria-label="Mobile">
+      <nav className={`bottom-nav${showBottomNav ? ' show' : ''}`} aria-label="Mobile">
         <button onClick={() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' })}>🏠</button>
         <button onClick={onToggleTheme}>{theme === 'light' ? '☾' : '☼'}</button>
         <button onClick={onOpenFavourites}>
