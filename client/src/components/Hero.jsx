@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 const EFFECTS = ['fx1', 'fx2', 'fx3']
-const SLOT_COUNT = 5
+const SLOT_COUNT = 4
 const ROTATE_INTERVAL_MS = 9000 // roughly the quiet point of the 18s per-slot loop
 
 function pickEffect() {
