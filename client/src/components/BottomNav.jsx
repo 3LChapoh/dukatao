@@ -8,12 +8,12 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 export default function BottomNav({ theme, onToggleTheme, onOpenCart, onOpenAccount, onOpenFavourites }) {
   const { count } = useCart()
   const { ids: favourites } = useFavourites()
-  const { scrolled, hidden, progress } = useScrollNav()
+  const { scrolled, progress } = useScrollNav()
 
   const dashoffset = CIRCUMFERENCE * (1 - progress)
-  // Mirrors the top nav's fade: visible once scrolled, but tucks away
-  // together with it while scrolling down, and returns together on scroll up.
-  const showBottomNav = scrolled && !hidden
+  // Pops up once the page is scrolled and stays put (sticky) regardless of
+  // scroll direction — independent of the top nav's own fade-on-scroll.
+  const showBottomNav = scrolled
 
   return (
     <>

@@ -16,6 +16,7 @@ import AllProductsPage from './pages/AllProductsPage'
 function HomePage() {
   const [stats, setStats] = useState({ products: '—' })
   const [heroImages, setHeroImages] = useState([])
+  const [heroLoaded, setHeroLoaded] = useState(false)
 
   useEffect(() => {
     productsApi
@@ -34,6 +35,7 @@ function HomePage() {
         if (data && Array.isArray(data.heroImages)) setHeroImages(data.heroImages)
       })
       .catch(() => {})
+      .finally(() => setHeroLoaded(true))
   }, [])
 
   // Category strip sends customers straight to the full products page,
@@ -44,7 +46,7 @@ function HomePage() {
 
   return (
     <SiteChrome>
-      <Hero stats={stats} heroImages={heroImages} />
+      <Hero stats={stats} heroImages={heroImages} loading={!heroLoaded} />
       <CategoryStrip onSelect={goToCategory} />
       <FeaturedProducts />
     </SiteChrome>
