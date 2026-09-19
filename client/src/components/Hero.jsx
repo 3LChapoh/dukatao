@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 
 const EFFECTS = ['fx1', 'fx2', 'fx3']
 const SLOT_COUNT = 4
-const ROTATE_INTERVAL_MS = 9000 // roughly the quiet point of the 18s per-slot loop
+const MIN_ROTATE_MS = 7000
+const MAX_ROTATE_MS = 15000
+const CROSSFADE_MS = 900
 
 function pickEffect() {
   return EFFECTS[Math.floor(Math.random() * EFFECTS.length)]
@@ -10,6 +12,48 @@ function pickEffect() {
 
 function srcOf(image) {
   return typeof image === 'string' ? image : image?.url
+}
+
+function randomDelay() {
+  return MIN_ROTATE_MS + Math.random() * (MAX_ROTATE_MS - MIN_ROTATE_MS)
+}
+
+// Renders one collage slot and crossfades smoothly whenever its `src` prop
+// changes, instead of popping straight to the new image.
+function HeroSlot({ src, effectClass, delayStyle, eager }) {
+  const [displaySrc, setDisplaySrc] = useState(src)
+  const [incomingSrc, setIncomingSrc] = useState(null)
+  const [reveal, setReveal] = useState(false)
+
+  useEffect(() => {
+    if (src === displaySrc) return
+    setIncomingSrc(src)
+    setReveal(false)
+    let raf2
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setReveal(true))
+    })
+    const settle = setTimeout(() => {
+      setDisplaySrc(src)
+      setIncomingSrc(null)
+      setReveal(false)
+    }, CROSSFADE_MS + 60)
+    return () => {
+      cancelAnimationFrame(raf1)
+      if (raf2) cancelAnimationFrame(raf2)
+      clearTimeout(settle)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src])
+
+  return (
+    <div className={`hero-slot ${effectClass}`} style={delayStyle}>
+      <img className="hs-img" src={displaySrc} alt="Household product" loading={eager ? 'eager' : 'lazy'} />
+      {incomingSrc && (
+        <img className={`hs-img hs-incoming${reveal ? ' reveal' : ''}`} src={incomingSrc} alt="" aria-hidden="true" />
+      )}
+    </div>
+  )
 }
 
 export default function Hero({ stats, heroImages = [], loading = false }) {
@@ -28,10 +72,7 @@ export default function Hero({ stats, heroImages = [], loading = false }) {
 
   // Each slot gets a randomly chosen reveal effect, re-rolled whenever the
   // image pool itself changes (not on every render).
-  const effects = useMemo(
-    () => Array.from({ length: SLOT_COUNT }, pickEffect),
-    [pool.length]
-  )
+  const effects = useMemo(() => Array.from({ length: SLOT_COUNT }, pickEffect), [pool.length])
 
   const [slotIndexes, setSlotIndexes] = useState(() =>
     Array.from({ length: SLOT_COUNT }, (_, i) => i % Math.max(pool.length, 1))
@@ -41,21 +82,34 @@ export default function Hero({ stats, heroImages = [], loading = false }) {
     setSlotIndexes(Array.from({ length: SLOT_COUNT }, (_, i) => i % Math.max(pool.length, 1)))
   }, [pool.length])
 
-  // When there's more than one image available, keep randomly reshuffling
-  // which image each slot shows, so the collage keeps changing over time
-  // instead of looping the same five images forever.
+  // Each slot rotates on its own independently randomized timer, so all four
+  // never change at once — and each pick avoids whatever image any other
+  // slot is currently showing, so the same photo never appears twice.
   useEffect(() => {
     if (pool.length <= 1) return
-    const timer = setInterval(() => {
-      setSlotIndexes((prev) =>
-        prev.map((idx) => {
-          let next = Math.floor(Math.random() * pool.length)
-          if (pool.length > 1 && next === idx) next = (next + 1) % pool.length
+    const timers = []
+
+    function scheduleNext(slotIdx) {
+      const id = setTimeout(() => {
+        setSlotIndexes((prev) => {
+          const usedElsewhere = prev.filter((_, i) => i !== slotIdx)
+          const options = pool
+            .map((_, i) => i)
+            .filter((i) => i !== prev[slotIdx] && !usedElsewhere.includes(i))
+          const pick = options.length
+            ? options[Math.floor(Math.random() * options.length)]
+            : (prev[slotIdx] + 1) % pool.length
+          const next = [...prev]
+          next[slotIdx] = pick
           return next
         })
-      )
-    }, ROTATE_INTERVAL_MS)
-    return () => clearInterval(timer)
+        scheduleNext(slotIdx)
+      }, randomDelay())
+      timers.push(id)
+    }
+
+    for (let i = 0; i < SLOT_COUNT; i++) scheduleNext(i)
+    return () => timers.forEach(clearTimeout)
   }, [pool.length])
 
   return (
@@ -71,18 +125,15 @@ export default function Hero({ stats, heroImages = [], loading = false }) {
                 style={{ animationDelay: `${-i * 3.4}s` }}
               />
             ))
-          : slotIndexes.map((imgIdx, i) => {
-              const src = srcOf(pool[imgIdx])
-              return (
-                <div
-                  className={`hero-slot ${effects[i]}`}
-                  key={i}
-                  style={{ animationDelay: `${-i * 3.4}s` }}
-                >
-                  <img src={src} alt="Household product" loading={i === 0 ? 'eager' : 'lazy'} />
-                </div>
-              )
-            })}
+          : slotIndexes.map((imgIdx, i) => (
+              <HeroSlot
+                key={i}
+                src={srcOf(pool[imgIdx])}
+                effectClass={effects[i]}
+                delayStyle={{ animationDelay: `${-i * 3.4}s` }}
+                eager={i === 0}
+              />
+            ))}
       </div>
 
       <div className="hero-layer near" />

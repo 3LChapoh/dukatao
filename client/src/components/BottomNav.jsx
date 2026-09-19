@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useCart } from '../context/CartContext'
 import { useFavourites } from '../context/FavouritesContext'
 import { useScrollNav } from '../hooks/useScrollNav'
@@ -9,6 +10,13 @@ export default function BottomNav({ theme, onToggleTheme, onOpenCart, onOpenAcco
   const { count } = useCart()
   const { ids: favourites } = useFavourites()
   const { scrolled, progress } = useScrollNav()
+  const [themeSpin, setThemeSpin] = useState(false)
+
+  function handleThemeToggle() {
+    onToggleTheme()
+    setThemeSpin(true)
+    setTimeout(() => setThemeSpin(false), 500)
+  }
 
   const dashoffset = CIRCUMFERENCE * (1 - progress)
   // Pops up once the page is scrolled and stays put (sticky) regardless of
@@ -37,7 +45,9 @@ export default function BottomNav({ theme, onToggleTheme, onOpenCart, onOpenAcco
     <>
       <nav className={`bottom-nav${showBottomNav ? ' show' : ''}`} aria-label="Mobile">
         <button onClick={goHome} aria-label="Go to homepage">🏠</button>
-        <button onClick={onToggleTheme}>{theme === 'light' ? '☾' : '☼'}</button>
+        <button className={themeSpin ? 'spin-tap' : ''} onClick={handleThemeToggle} aria-label="Toggle theme">
+          {theme === 'light' ? '☾' : '☼'}
+        </button>
         <button onClick={onOpenFavourites}>
           ♡ <span className="cart-count">{favourites.length}</span>
         </button>
