@@ -15,10 +15,28 @@ export default function BottomNav({ theme, onToggleTheme, onOpenCart, onOpenAcco
   // scroll direction — independent of the top nav's own fade-on-scroll.
   const showBottomNav = scrolled
 
+  // The home button always lands on the homepage, no matter which page
+  // (products, admin, etc.) it's tapped from — not just when already home.
+  function goHome() {
+    const onHome = !window.location.hash || window.location.hash === '#' || window.location.hash === '#home'
+    if (onHome) {
+      document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    window.location.hash = ''
+    // Give React a couple of frames to switch routes and mount the home
+    // page before trying to scroll to its hero section.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' })
+      })
+    })
+  }
+
   return (
     <>
       <nav className={`bottom-nav${showBottomNav ? ' show' : ''}`} aria-label="Mobile">
-        <button onClick={() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' })}>🏠</button>
+        <button onClick={goHome} aria-label="Go to homepage">🏠</button>
         <button onClick={onToggleTheme}>{theme === 'light' ? '☾' : '☼'}</button>
         <button onClick={onOpenFavourites}>
           ♡ <span className="cart-count">{favourites.length}</span>
